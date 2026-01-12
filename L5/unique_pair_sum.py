@@ -1,18 +1,34 @@
 def unique_pair_sum(numbers, target):
-    seen = set()
-    pairs = set()
+    try:
+        # Verificam tipul inputului
+        if not isinstance(numbers, list):
+            raise TypeError("numbers trebuie sa fie o lista de numere.")
+        if not isinstance(target, (int, float)):
+            raise TypeError("target trebuie sa fie un numar.")
 
-    for num in numbers:
-        complement = target - num
+        seen = set()
+        pairs = set()
 
-        if complement in seen:
+        for num in numbers:
+            if not isinstance(num, (int, float)):
+                raise TypeError("Toate elementele din numbers trebuie sa fie numere.")
 
-            pair = tuple(sorted((num, complement)))
-            pairs.add(pair)
+            complement = target - num
 
-        seen.add(num)
+            if complement in seen:
+                pair = tuple(sorted((num, complement)))
+                pairs.add(pair)
 
-    return pairs
+            seen.add(num)
+
+        return pairs
+
+    except TypeError as e:
+        print(f"Eroare de tip: {e}")
+        return set()
+    except Exception as e:
+        print(f"Eroare neasteptata: {e}")
+        return set()
 
 
 numbers = [1, 2, 3, 4, 3, 5, 6]
