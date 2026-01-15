@@ -4,7 +4,7 @@ FILE_NAME = "movies.txt"
 def load_movies():
     movies = {}
     try:
-        with open(FILE_NAME, "r", encoding="utf-8") as file:
+        with open(FILE_NAME, "r") as file:
             for line in file.readlines():
                 title, rating = line.strip().split(", ")
                 movies[title] = int(rating)
@@ -14,7 +14,7 @@ def load_movies():
 
 
 def save_movies(movies):
-    with open(FILE_NAME, "w", encoding="utf-8") as file:
+    with open(FILE_NAME, "w") as file:
         for title, rating in movies.items():
             file.write(f"{title}, {rating}\n")
 

@@ -1,7 +1,7 @@
 def reverse_lines(input_file, output_file):
     try:
-        with open(input_file, 'r', encoding='utf-8') as infile, \
-             open(output_file, 'w', encoding='utf-8') as outfile:
+        with open(input_file, 'r') as infile, \
+             open(output_file, 'w') as outfile:
 
             for line in infile:
                 outfile.write(line.rstrip()[::-1] + '\n')
