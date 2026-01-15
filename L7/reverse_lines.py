@@ -12,3 +12,5 @@ def reverse_lines(input_file, output_file):
         print("Eroare la citirea sau scrierea fișierelor.")
     except Exception as e:
         print(f"Eroare neașteptată: {e}")
+
+reverse_lines("input.txt", "output.txt");

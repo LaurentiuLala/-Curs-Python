@@ -10,3 +10,5 @@ def count_words_in_file(filename):
         print(f"Eroare: Nu s-a putut citi fișierul '{filename}'.")
     except Exception as e:
         print(f"Eroare neașteptată: {e}")
+
+print (count_words_in_file("test.txt"));
