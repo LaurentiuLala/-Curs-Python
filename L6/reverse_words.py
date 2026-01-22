@@ -24,3 +24,4 @@ def reverse_words(sentence):
 # Exemplu
 sentence = "soricel   un cu   joaca se pisica"
 print(reverse_words(sentence))
+
