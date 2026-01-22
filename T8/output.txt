@@ -1,0 +1,5 @@
+Media: 7.0
+Minim: 3
+Maxim: 12
+Număr valori pare: 4
+Mediană: 7
