@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from datetime import datetime
 
 MOVIE_FILE = "movies.txt"
 
@@ -8,7 +9,7 @@ MOVIE_FILE = "movies.txt"
 def load_movies():
     movies = []
     try:
-        with open(MOVIE_FILE, "r") as f:
+        with open(MOVIE_FILE, "r", encoding="utf-8") as f:
             for line in f:
                 title, year, genre, rating, desc = line.strip().split("|")
                 movies.append({
@@ -22,12 +23,10 @@ def load_movies():
         pass
     return movies
 
-
 def save_movies():
-    with open(MOVIE_FILE, "w") as f:
+    with open(MOVIE_FILE, "w", encoding="utf-8") as f:
         for m in movies:
             f.write(f"{m['title']}|{m['year']}|{m['genre']}|{m['rating']}|{m['description']}\n")
-
 
 movies = load_movies()
 current_role = None
@@ -47,7 +46,6 @@ def open_login():
     login_window.geometry("300x200")
 
     tk.Label(login_window, text="Select role", font=("Arial", 14)).pack(pady=20)
-
     tk.Button(login_window, text="Admin", width=15, command=lambda: login("admin")).pack(pady=5)
     tk.Button(login_window, text="User", width=15, command=lambda: login("user")).pack(pady=5)
 
@@ -57,7 +55,7 @@ def open_login():
 
 def open_main_app():
     app = tk.Tk()
-    app.title("🎬 Movie Gallery")
+    app.title("Movie Gallery")
     app.geometry("800x400")
 
     left = tk.Frame(app)
@@ -103,13 +101,15 @@ def open_main_app():
 
         fields = ["Title", "Year", "Genre", "Rating", "Description"]
         for i, field in enumerate(fields):
-            tk.Label(win, text=field).grid(row=i, column=0)
+            tk.Label(win, text=field).grid(row=i, column=0, sticky="w", padx=5, pady=2)
             e = tk.Entry(win, width=40)
-            e.grid(row=i, column=1)
+            e.grid(row=i, column=1, padx=5, pady=2)
             entries[field.lower()] = e
 
+        movie_index = None
         if edit and listbox.curselection():
-            m = movies[listbox.curselection()[0]]
+            movie_index = listbox.curselection()[0]
+            m = movies[movie_index]
             entries["title"].insert(0, m["title"])
             entries["year"].insert(0, m["year"])
             entries["genre"].insert(0, m["genre"])
@@ -117,11 +117,43 @@ def open_main_app():
             entries["description"].insert(0, m["description"])
 
         def save():
-            data = {k: v.get() for k, v in entries.items()}
-            if edit:
-                movies[listbox.curselection()[0]] = data
+            data = {k: v.get().strip() for k, v in entries.items()}
+
+            # Verifică dacă toate câmpurile sunt completate
+            empty_fields = [k for k, v in data.items() if v == ""]
+            if empty_fields:
+                messagebox.showerror("Error", f"Please fill all fields before saving.")
+                return
+
+            # Verificare Year
+            try:
+                year_value = int(data["year"])
+                current_year = datetime.now().year
+                if year_value < 1800 or year_value > current_year:
+                    messagebox.showerror("Error", f"Year must be between 1800 and {current_year}.")
+                    return
+                data["year"] = str(year_value)
+            except ValueError:
+                messagebox.showerror("Error", "Year must be a valid number.")
+                return
+
+            # Verificare Rating
+            try:
+                rating_value = float(data["rating"])
+                if rating_value < 0 or rating_value > 10:
+                    messagebox.showerror("Error", "Rating must be a number between 0 and 10.")
+                    return
+                data["rating"] = str(rating_value)
+            except ValueError:
+                messagebox.showerror("Error", "Rating must be a valid number.")
+                return
+
+            # Salvează filmul
+            if edit and movie_index is not None:
+                movies[movie_index] = data
             else:
                 movies.append(data)
+
             save_movies()
             refresh_list()
             win.destroy()
@@ -130,9 +162,10 @@ def open_main_app():
 
     def delete_movie():
         if listbox.curselection():
-            del movies[listbox.curselection()[0]]
-            save_movies()
-            refresh_list()
+            if messagebox.askyesno("Confirm", "Are you sure you want to delete this movie?"):
+                del movies[listbox.curselection()[0]]
+                save_movies()
+                refresh_list()
 
     # ------------------ LOGOUT ------------------
 
@@ -146,13 +179,13 @@ def open_main_app():
         admin_frame = tk.Frame(left)
         admin_frame.pack(pady=10)
 
-        tk.Button(admin_frame, text="➕ Add", command=lambda: movie_form()).pack(fill="x")
-        tk.Button(admin_frame, text="✏️ Edit", command=lambda: movie_form(edit=True)).pack(fill="x")
-        tk.Button(admin_frame, text="❌ Delete", command=delete_movie).pack(fill="x")
+        tk.Button(admin_frame, text="Add", command=lambda: movie_form()).pack(fill="x", pady=2)
+        tk.Button(admin_frame, text="Edit", command=lambda: movie_form(edit=True)).pack(fill="x", pady=2)
+        tk.Button(admin_frame, text="Delete", command=delete_movie).pack(fill="x", pady=2)
 
     # ------------------ LOGOUT BUTTON ------------------
 
-    tk.Button(left, text="🔄 Logout", command=logout).pack(pady=20, fill="x")
+    tk.Button(left, text="Logout", command=logout).pack(pady=20, fill="x")
 
     app.mainloop()
 
